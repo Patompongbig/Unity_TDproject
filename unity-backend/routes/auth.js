@@ -7,19 +7,18 @@ const router = express.Router();
 
 // ✅ Register a New User
 router.post('/register', async (req, res) => {
-    console.log("📩 Received Data:", req.body);
-
     const { username, email, password } = req.body;
+
     if (!username || !email || !password) {
         return res.status(400).json({ error: "❌ All fields are required!" });
     }
 
-    // ✅ Hash the Password Before Storing It
+    // ✅ Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
+    const newUser = new User({ username, email, passwordHash: hashedPassword });
 
     try {
-        await newUser.save(); // ✅ Insert into MongoDB
+        await newUser.save();
         res.status(201).json({ message: "✅ User registered successfully!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -31,12 +30,12 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
         return res.status(400).json({ error: "❌ Invalid credentials" });
     }
 
-    // ✅ Generate JWT Token for Authentication
-    const token = jwt.sign({ userId: user._id }, 'secretkey');
+    // ✅ Generate JWT Token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secretkey');
     res.json({ token });
 });
 

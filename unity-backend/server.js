@@ -7,23 +7,30 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // ✅ Ensures JSON parsing
 
-// ✅ Debugging Middleware (Logs incoming requests)
-app.use((req, res, next) => {
-    console.log("🔹 Incoming Request:", req.method, req.url);
-    console.log("🔹 Headers:", req.headers);
-    console.log("🔹 Body:", req.body);
-    next();
-});
-
 // ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => console.log("✅ Connected to MongoDB (Docker)"))
+}).then(() => console.log("✅ Connected to MongoDB"))
 .catch(err => console.log("❌ MongoDB Connection Error:", err));
 
-// ✅ Ensure This Line Exists
-app.use('/auth', require('./routes/auth'));
+// ✅ Import Routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/userRoutes');
+const towerRoutes = require('./routes/towerRoutes');
+const itemRoutes = require('./routes/itemRoutes');
+const monsterRoutes = require('./routes/monsterRoutes');
+const mapRoutes = require('./routes/mapRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+
+// ✅ Use Routes
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/towers', towerRoutes);
+app.use('/items', itemRoutes);
+app.use('/monsters', monsterRoutes);
+app.use('/maps', mapRoutes);
+app.use('/transactions', transactionRoutes);
 
 // ✅ Simple API Test Route
 app.get('/', (req, res) => {
