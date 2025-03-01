@@ -1,18 +1,14 @@
-require('dotenv').config();
+require('dotenv').config(); // ✅ Load environment variables
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const connectDB = require('./config/db'); // ✅ Import DB connection function
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // ✅ Ensures JSON parsing
+app.use(express.json()); // ✅ Middleware for JSON parsing
 
 // ✅ Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log("✅ Connected to MongoDB"))
-.catch(err => console.log("❌ MongoDB Connection Error:", err));
+connectDB();
 
 // ✅ Import Routes
 const authRoutes = require('./routes/auth');
