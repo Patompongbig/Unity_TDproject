@@ -9,9 +9,7 @@ const monsterSchema = new mongoose.Schema({
         damage: Number,
         armor: Number
     },
-    specialAbilities: [String],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    specialAbilities: [String]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Monster', monsterSchema);

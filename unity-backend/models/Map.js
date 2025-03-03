@@ -12,9 +12,7 @@ const mapSchema = new mongoose.Schema({
         }
     ],
     environmentType: { type: String, enum: ['forest', 'desert', 'volcanic'], required: true },
-    difficultyRating: Number,
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    difficultyRating: Number
 }, { timestamps: true });
 
 module.exports = mongoose.model('Map', mapSchema);

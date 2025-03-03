@@ -13,9 +13,7 @@ const itemSchema = new mongoose.Schema({
         effectPower: Number,
         duration: Number
     },
-    rarity: { type: String, enum: ['Common', 'Rare', 'Legendary'], default: 'Common' },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    rarity: { type: String, enum: ['Common', 'Rare', 'Legendary'], default: 'Common' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Item', itemSchema);
