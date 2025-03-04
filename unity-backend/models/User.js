@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema(
         ownedTowers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tower" }], // Tower inventory
         ownedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item" }],   // Item inventory
 
+        totalGems: {type: Number, default: 0},
+
         stats: {
             level: { type: Number, default: 1 },
             totalKills: { type: Number, default: 0 },

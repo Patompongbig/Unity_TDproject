@@ -12,4 +12,4 @@ const monsterSchema = new mongoose.Schema({
     specialAbilities: [String]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Monster', monsterSchema);
+module.exports = mongoose.model('Monster', monsterSchema, "monsterdb");

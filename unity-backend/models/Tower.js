@@ -19,4 +19,4 @@ const towerSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Tower", towerSchema);
+module.exports = mongoose.model("Tower", towerSchema, "towerdb");

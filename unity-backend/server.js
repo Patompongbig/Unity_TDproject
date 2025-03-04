@@ -17,7 +17,6 @@ const towerRoutes = require('./routes/towerRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const monsterRoutes = require('./routes/monsterRoutes');
 const mapRoutes = require('./routes/mapRoutes');
-const transactionRoutes = require('./routes/transactionRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 
 // ✅ Use Routes
@@ -27,7 +26,6 @@ app.use('/towers', towerRoutes);
 app.use('/items', itemRoutes);
 app.use('/monsters', monsterRoutes);
 app.use('/maps', mapRoutes);
-app.use('/transactions', transactionRoutes);
 app.use('/api/game', gameRoutes);
 
 // ✅ Simple API Test Route

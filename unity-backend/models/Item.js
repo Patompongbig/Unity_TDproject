@@ -16,4 +16,4 @@ const itemSchema = new mongoose.Schema({
     rarity: { type: String, enum: ['Common', 'Rare', 'Legendary'], default: 'Common' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Item', itemSchema);
+module.exports = mongoose.model('Item', itemSchema, "itemdb");

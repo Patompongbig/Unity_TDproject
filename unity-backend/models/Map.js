@@ -15,4 +15,4 @@ const mapSchema = new mongoose.Schema({
     difficultyRating: Number
 }, { timestamps: true });
 
-module.exports = mongoose.model('Map', mapSchema);
+module.exports = mongoose.model('Map', mapSchema, "mapdb");
