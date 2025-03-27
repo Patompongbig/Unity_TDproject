@@ -13,13 +13,17 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ error: "❌ All fields are required!" });
     }
 
-    // ✅ Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, passwordHash: hashedPassword });
 
     try {
         await newUser.save();
-        res.status(201).json({ message: "✅ User registered successfully!" });
+
+        // ✅ สร้าง JWT Token หลังจากสมัครสำเร็จ
+        const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET || 'secretkey');
+
+        // ✅ ส่ง token กลับให้ Unity ใช้
+        res.status(201).json({ token });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
