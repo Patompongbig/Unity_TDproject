@@ -2,6 +2,7 @@ const express = require("express");
 const Tower = require("../models/Tower");
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ const router = express.Router();
  */
 router.post("/create", authMiddleware, async (req, res) => {
     try {
-        const { name, cost, maxPlacementLimit, attackRange, attackRate, damage, rarity, prefabPath } = req.body;
+        const { name, cost, maxPlacementLimit, attackRange, attackRate, damage, rarity, aoeRadius, prefabPath } = req.body;
 
         // Validate inputs
         if (!name || !cost || !maxPlacementLimit || !attackRange || !attackRate || !damage || !rarity || !prefabPath) {
@@ -26,6 +27,7 @@ router.post("/create", authMiddleware, async (req, res) => {
             attackRate,
             damage,
             rarity,
+            aoeRadius,
             prefabPath,
             ownerId: req.user.userId // Assign the current logged-in user as the owner
         });
@@ -53,7 +55,21 @@ router.get("/my-towers", authMiddleware, async (req, res) => {
         const user = await User.findById(req.user.userId).populate("ownedTowers");
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        res.json(user.ownedTowers);
+        // Transform towers to include towerId instead of _id
+        const transformedTowers = user.ownedTowers.map(tower => ({
+            towerId: tower._id.toString(), // Convert ObjectId to string
+            name: tower.name,
+            cost: tower.cost,
+            maxPlacementLimit: tower.maxPlacementLimit,
+            attackRange: tower.attackRange,
+            attackRate: tower.attackRate,
+            damage: tower.damage,
+            rarity: tower.rarity,
+            aoeRadius: tower.aoeRadius,
+            prefabPath: tower.prefabPath
+        }));
+
+        res.json(transformedTowers);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -64,36 +80,34 @@ router.get("/my-towers", authMiddleware, async (req, res) => {
  */
 router.post("/remove", authMiddleware, async (req, res) => {
     try {
-        const { towerId } = req.body;
+        const towerId = new mongoose.Types.ObjectId(req.body.towerId); // 🔥 Convert to ObjectId
         const user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // ✅ Debug logs
+        console.log("[DEBUG] User ID from token:", req.user.userId.toString());
+        console.log("[DEBUG] Tower ID to delete:", towerId);
+        console.log("[DEBUG] User's ownedTowers:", user.ownedTowers);
+
+        // Check ownership using `.equals()` instead of `toString()`
+        const ownsTower = user.ownedTowers.some(t => t.equals(towerId));
+        if (!ownsTower) {
+            return res.status(403).json({ error: "User does not own this tower" });
         }
 
-        // 1) Optional: Delay execution by 2 seconds (2000 ms)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // 2) Remove towerId from the user's ownedTowers array
-        user.ownedTowers = user.ownedTowers.filter(t => t.toString() !== towerId);
+        // Remove tower from user's inventory
+        user.ownedTowers = user.ownedTowers.filter(t => !t.equals(towerId));
         await user.save();
 
-        // 3) Delete the tower from the DB
-        const removedTower = await Tower.findByIdAndDelete(towerId);
-
-        // 4) Confirm it was deleted
-        const check = await Tower.findById(towerId); 
-        if (check) {
-            // If we still find the tower, something went wrong
-            return res.status(500).json({ error: "Tower deletion failed; tower still exists in DB." });
+        // Delete tower from database
+        const deletedTower = await Tower.findByIdAndDelete(towerId);
+        if (!deletedTower) {
+            return res.status(404).json({ error: "Tower not found" });
         }
 
-        // 5) If you'd like a full page refresh (non-AJAX), you can redirect:
-        // return res.redirect("/some-route-or-page");
-        //    or
-        // 6) If you're doing an AJAX request, just respond with JSON and let the frontend refresh:
-        return res.json({ message: "Tower successfully deleted and confirmed in DB." });
+        res.json({ message: "Tower deleted successfully" });
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 

@@ -13,6 +13,7 @@ const towerSchema = new mongoose.Schema(
             enum: ["Common", "Rare", "Epic", "Legendary"],
             required: true
         },
+        aoeRadius: { type: Number, required: true },
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Player who owns the tower
         prefabPath: { type: String, required: true } // Reference to Unity prefab
     },
