@@ -66,17 +66,34 @@ router.post("/remove", authMiddleware, async (req, res) => {
     try {
         const { towerId } = req.body;
         const user = await User.findById(req.user.userId);
-        if (!user) return res.status(404).json({ error: "User not found" });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
 
+        // 1) Optional: Delay execution by 2 seconds (2000 ms)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 2) Remove towerId from the user's ownedTowers array
         user.ownedTowers = user.ownedTowers.filter(t => t.toString() !== towerId);
         await user.save();
 
-        // Delete tower from database
-        await Tower.findByIdAndDelete(towerId);
+        // 3) Delete the tower from the DB
+        const removedTower = await Tower.findByIdAndDelete(towerId);
 
-        res.json({ message: "Tower removed from inventory!" });
+        // 4) Confirm it was deleted
+        const check = await Tower.findById(towerId); 
+        if (check) {
+            // If we still find the tower, something went wrong
+            return res.status(500).json({ error: "Tower deletion failed; tower still exists in DB." });
+        }
+
+        // 5) If you'd like a full page refresh (non-AJAX), you can redirect:
+        // return res.redirect("/some-route-or-page");
+        //    or
+        // 6) If you're doing an AJAX request, just respond with JSON and let the frontend refresh:
+        return res.json({ message: "Tower successfully deleted and confirmed in DB." });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ error: err.message });
     }
 });
 
