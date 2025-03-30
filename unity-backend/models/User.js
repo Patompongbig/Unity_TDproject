@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema(
         stats: {
             level: { type: Number, default: 1 },
             totalKills: { type: Number, default: 0 },
+            farthestWave: { type: Number, default: 0 }, // New field
             totalWavesDefeated: { type: Number, default: 0 },
             totalPlayTime: { type: Number, default: 0 }
         }
