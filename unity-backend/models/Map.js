@@ -11,7 +11,11 @@ const mapSchema = new mongoose.Schema({
             ]
         }
     ],
-    environmentType: { type: String, enum: ['forest', 'desert', 'volcanic'], required: true },
+    environmentType: { 
+        type: String, 
+        enum: ['forest', 'desert', 'volcanic', 'grassland'], // Add new type
+        required: true 
+    },
     difficultyRating: Number
 }, { timestamps: true });
 
